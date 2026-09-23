@@ -14,144 +14,239 @@ class FeatureDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      decoration: const BoxDecoration(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 16,
-            offset: Offset(0, -4),
+            color: const Color(0xFF0F172A).withAlpha(30),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+            spreadRadius: 2,
           ),
         ],
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag handle
+          // Drag handle indicator
           Center(
             child: Container(
-              width: 40,
+              width: 36,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+                color: const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
 
-          // Header with close button
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.location_on_rounded,
-                  color: Color(0xFF1E88E5),
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top Tag & Close Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      feature.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2937),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFFDBEAFE)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF2563EB),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            feature.district.isNotEmpty
+                                ? feature.district
+                                : 'Pariwisata',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1D4ED8),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${feature.district}, ${feature.regencyCity}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Color(0xFF64748B),
+                        size: 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 20,
+                      onPressed: onClose ?? () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Title / Object Name
+                Text(
+                  feature.name,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                // Location Subtitle
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.place_outlined,
+                      size: 15,
+                      color: Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${feature.regencyCity}, ${feature.province}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: onClose ?? () => Navigator.of(context).pop(),
-                splashRadius: 20,
-              ),
-            ],
-          ),
+                const SizedBox(height: 16),
 
-          const Divider(height: 24),
+                // Modern Cards Info Grid
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFF1F5F9)),
+                  ),
+                  child: Column(
+                    children: [
+                      // Address row
+                      _buildDetailRow(
+                        icon: Icons.signpost_outlined,
+                        title: 'Alamat',
+                        value: feature.address,
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Divider(color: Color(0xFFE2E8F0), height: 1),
+                      ),
+                      // Village & Period
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildDetailRow(
+                              icon: Icons.holiday_village_outlined,
+                              title: 'Desa/Kelurahan',
+                              value: feature.village,
+                            ),
+                          ),
+                          Container(
+                            height: 28,
+                            width: 1,
+                            color: const Color(0xFFE2E8F0),
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          Expanded(
+                            child: _buildDetailRow(
+                              icon: Icons.calendar_today_outlined,
+                              title: 'Periode Update',
+                              value: feature.period,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
 
-          // Detail Attributes
-          _buildInfoRow(
-            icon: Icons.place_outlined,
-            label: 'Alamat',
-            value: feature.address,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildInfoRow(
-                  icon: Icons.map_outlined,
-                  label: 'Desa / Kelurahan',
-                  value: feature.village,
+                // Coordinate Pill Bar
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.gps_fixed_rounded,
+                        size: 14,
+                        color: Color(0xFF475569),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Lat: ${feature.latitude.toStringAsFixed(6)}   |   Lng: ${feature.longitude.toStringAsFixed(6)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF334155),
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildInfoRow(
-                  icon: Icons.access_time_rounded,
-                  label: 'Waktu / Periode',
-                  value: feature.period,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            icon: Icons.my_location_rounded,
-            label: 'Koordinat',
-            value:
-                '${feature.latitude.toStringAsFixed(6)}, ${feature.longitude.toStringAsFixed(6)}',
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow({
+  Widget _buildDetailRow({
     required IconData icon,
-    required String label,
+    required String title,
     required String value,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.blueGrey.shade600),
-        const SizedBox(width: 8),
+        Icon(icon, size: 16, color: const Color(0xFF3B82F6)),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                label,
-                style: TextStyle(
+                title,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade500,
+                  color: Color(0xFF94A3B8),
                 ),
               ),
               const SizedBox(height: 2),
@@ -159,8 +254,8 @@ class FeatureDetailSheet extends StatelessWidget {
                 value.isEmpty ? '-' : value,
                 style: const TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF374151),
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1E293B),
                 ),
               ),
             ],
