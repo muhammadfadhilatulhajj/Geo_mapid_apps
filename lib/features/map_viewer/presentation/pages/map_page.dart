@@ -247,18 +247,30 @@ class _MapPageState extends State<MapPage> {
                       ),
                       child: Row(
                         children: [
+                          // Brand icon identical to Splash Screen (glowing blue gradient + map_rounded)
                           Container(
-                            width: 36,
-                            height: 36,
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A),
-                              borderRadius: BorderRadius.circular(10),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF3B82F6).withAlpha(80),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
                             child: const Center(
                               child: Icon(
-                                Icons.explore_rounded,
-                                color: Color(0xFF38BDF8),
-                                size: 20,
+                                Icons.map_rounded,
+                                color: Colors.white,
+                                size: 22,
                               ),
                             ),
                           ),
@@ -267,13 +279,27 @@ class _MapPageState extends State<MapPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Geo MAPID',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F172A),
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Geo ',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF0F172A),
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                    Text(
+                                      'MAPID',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF2563EB),
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 Text(
                                   'Peta Explorer • Pariwisata Jogja',
@@ -292,7 +318,7 @@ class _MapPageState extends State<MapPage> {
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Color(0xFF059669),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                         ],
@@ -381,50 +407,65 @@ class _MapPageState extends State<MapPage> {
                 ),
               ),
 
-              // Tooltip Pill: "Ketuk marker detail"
-              Positioned(
-                top: 132,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A).withAlpha(220),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(25),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.touch_app_rounded,
-                          color: Color(0xFF34D399),
-                          size: 14,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Ketuk marker titik untuk info detail',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'monospace',
+              // Adjusted Floating Tooltip Pill (Matching Reference Style: White pill, dark text, pulsing dot)
+              if (state.selectedFeature == null)
+                Positioned(
+                  top: 142,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A).withAlpha(225),
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(30),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
                           ),
+                        ],
+                        border: Border.all(
+                          color: Colors.white.withAlpha(40),
+                          width: 1,
                         ),
-                      ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF34D399),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Ketuk marker titik untuk info detail',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.touch_app_rounded,
+                            color: Color(0xFF34D399),
+                            size: 15,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
               // Floating Controls Stack (North, Zoom In/Out, Refresh Layer, GPS)
               Positioned(
