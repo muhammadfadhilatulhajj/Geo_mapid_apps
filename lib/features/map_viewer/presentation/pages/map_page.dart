@@ -23,12 +23,19 @@ class _MapPageState extends State<MapPage> {
   final Map<String, GeoFeatureEntity> _featuresById = {};
   Circle? _userLocationCircle;
   Circle? _userLocationPulseCircle;
-  String _activeCategoryFilter = 'Semua';
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     context.read<MapBloc>().add(const LoadGeoLayerEvent());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -63,12 +70,17 @@ class _MapPageState extends State<MapPage> {
     _featuresById.clear();
     await _mapController?.clearCircles();
 
-    final filtered = _activeCategoryFilter == 'Semua'
+    final query = _searchQuery.trim().toLowerCase();
+    final filtered = query.isEmpty
         ? features
-        : features.where((f) => f.district.contains(_activeCategoryFilter)).toList();
+        : features.where((f) {
+            return f.name.toLowerCase().contains(query) ||
+                f.address.toLowerCase().contains(query) ||
+                f.district.toLowerCase().contains(query) ||
+                f.village.toLowerCase().contains(query);
+          }).toList();
 
     for (final feature in filtered) {
-      // Emerald Green marker matching the reference screenshot design
       final circle = await _mapController?.addCircle(
         CircleOptions(
           geometry: LatLng(feature.latitude, feature.longitude),
@@ -84,6 +96,17 @@ class _MapPageState extends State<MapPage> {
       if (circle != null) {
         _featuresById[circle.id] = feature;
       }
+    }
+
+    // If search returned results, fly to first match
+    if (query.isNotEmpty && filtered.isNotEmpty) {
+      final first = filtered.first;
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(first.latitude, first.longitude),
+          14.8,
+        ),
+      );
     }
   }
 
@@ -176,8 +199,6 @@ class _MapPageState extends State<MapPage> {
           }
         },
         builder: (context, state) {
-          final totalCount = state.layer?.features.length ?? 0;
-
           return Stack(
             children: [
               // MapLibre GL with OpenFreeMap Liberty Style
@@ -194,23 +215,20 @@ class _MapPageState extends State<MapPage> {
                 onStyleLoadedCallback: _onStyleLoaded,
                 myLocationEnabled: false,
                 trackCameraPosition: true,
-                compassEnabled: false, // Custom compass implemented in actions
+                compassEnabled: false,
               ),
 
-              // Top Bar & Filter Chips Header (Matching Reference Screenshot)
+              // Clean Header & Functional Search Bar
               SafeArea(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Top App Header
+                    // Top App Header: Logo + App Name Only
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
+                      margin: const EdgeInsets.fromLTRB(16, 6, 16, 6),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
-                        vertical: 8,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -229,7 +247,6 @@ class _MapPageState extends State<MapPage> {
                       ),
                       child: Row(
                         children: [
-                          // Brand icon
                           Container(
                             width: 36,
                             height: 36,
@@ -245,7 +262,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,7 +270,7 @@ class _MapPageState extends State<MapPage> {
                                 Text(
                                   'Geo MAPID',
                                   style: TextStyle(
-                                    fontSize: 14.5,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w800,
                                     color: Color(0xFF0F172A),
                                   ),
@@ -261,7 +278,7 @@ class _MapPageState extends State<MapPage> {
                                 Text(
                                   'Peta Explorer • Pariwisata Jogja',
                                   style: TextStyle(
-                                    fontSize: 10.5,
+                                    fontSize: 11,
                                     color: Color(0xFF64748B),
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -269,128 +286,26 @@ class _MapPageState extends State<MapPage> {
                               ],
                             ),
                           ),
-                          // Accuracy badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0FDF4),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: const Color(0xFFBBF7D0),
+                          if (state.status == MapStatus.loading)
+                            const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFF059669),
                               ),
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.satellite_alt_rounded,
-                                  size: 13,
-                                  color: Color(0xFF16A34A),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  '±2.4m',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF15803D),
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Profile avatar circle
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF065F46),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.person_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 4),
 
-                    // Layer Pill & Projection Bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE2E8F0).withAlpha(160),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF059669),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  'Layer: Pariwisata Jogja ($totalCount)',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF334155),
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          const Row(
-                            children: [
-                              Icon(
-                                Icons.public_rounded,
-                                size: 12,
-                                color: Color(0xFF64748B),
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'WGS84',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xFF64748B),
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: 'monospace',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Search Bar Box
+                    // Functional Search Bar Box
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
+                        horizontal: 12,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -414,46 +329,51 @@ class _MapPageState extends State<MapPage> {
                             color: Color(0xFF64748B),
                             size: 20,
                           ),
-                          const SizedBox(width: 10),
-                          const Expanded(
-                            child: Text(
-                              'Cari objek wisata di Yogyakarta...',
-                              style: TextStyle(
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              style: const TextStyle(
                                 fontSize: 13,
-                                color: Color(0xFF94A3B8),
+                                color: Color(0xFF0F172A),
                                 fontWeight: FontWeight.w500,
                               ),
+                              decoration: const InputDecoration(
+                                hintText: 'Cari nama objek wisata, alamat...',
+                                hintStyle: TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF94A3B8),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              onChanged: (val) {
+                                setState(() {
+                                  _searchQuery = val;
+                                });
+                                if (state.layer != null) {
+                                  _renderGeoLayer(state.layer!.features);
+                                }
+                              },
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF059669),
-                              borderRadius: BorderRadius.circular(10),
+                          if (_searchQuery.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.clear_rounded,
+                                  size: 18, color: Color(0xFF64748B)),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                                if (state.layer != null) {
+                                  _renderGeoLayer(state.layer!.features);
+                                }
+                              },
                             ),
-                            child: const Icon(
-                              Icons.tune_rounded,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Horizontal Filter Chips
-                    SizedBox(
-                      height: 36,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: [
-                          _buildFilterChip('Semua ($totalCount)', 'Semua'),
-                          _buildFilterChip('Gondomanan', 'GONDOMANAN'),
-                          _buildFilterChip('Umbulharjo', 'UMBULHARJO'),
-                          _buildFilterChip('Gondokusuman', 'GONDOKUSUMAN'),
-                          _buildFilterChip('Danurejan', 'DANUREJAN'),
                         ],
                       ),
                     ),
@@ -461,9 +381,9 @@ class _MapPageState extends State<MapPage> {
                 ),
               ),
 
-              // Tooltip Pill: "Ketuk marker detail ↗"
+              // Tooltip Pill: "Ketuk marker detail"
               Positioned(
-                top: 198,
+                top: 132,
                 left: 0,
                 right: 0,
                 child: Center(
@@ -506,7 +426,7 @@ class _MapPageState extends State<MapPage> {
                 ),
               ),
 
-              // Floating Controls Stack (North, Zoom In/Out, Layer, GPS)
+              // Floating Controls Stack (North, Zoom In/Out, Refresh Layer, GPS)
               Positioned(
                 right: 16,
                 bottom: state.selectedFeature != null ? 360 : 36,
@@ -559,69 +479,6 @@ class _MapPageState extends State<MapPage> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, String categoryKey) {
-    final bool isSelected = _activeCategoryFilter == categoryKey;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          setState(() {
-            _activeCategoryFilter = categoryKey;
-          });
-          final state = context.read<MapBloc>().state;
-          if (state.layer != null) {
-            _renderGeoLayer(state.layer!.features);
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF065F46) : Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              if (!isSelected)
-                BoxShadow(
-                  color: Colors.black.withAlpha(10),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-            ],
-            border: Border.all(
-              color: isSelected
-                  ? const Color(0xFF065F46)
-                  : const Color(0xFFE2E8F0),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF34D399) : const Color(0xFF059669),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: isSelected ? Colors.white : const Color(0xFF334155),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
