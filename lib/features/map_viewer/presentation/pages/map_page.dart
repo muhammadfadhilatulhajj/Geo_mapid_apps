@@ -418,8 +418,10 @@ class _MapPageState extends State<MapPage> {
                                           size: 18,
                                         ),
                                         SizedBox(width: 8),
-                                        Text(
-                                          'Ketuk salah satu titik di peta untuk melihat detail.',
+                                        Expanded(
+                                          child: Text(
+                                            'Ketuk salah satu titik di peta untuk melihat detail.',
+                                          ),
                                         ),
                                       ],
                                     ),
