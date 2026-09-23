@@ -96,36 +96,21 @@ lib/
 
 ### 2. Kloning Repository
 ```bash
-git clone https://github.com/USERNAME/geo-mapid-app.git
-cd geo-mapid-app
+git clone https://github.com/muhammadfadhilatulhajj/Geo_mapid_apps.git
+cd Geo_mapid_apps
 ```
 
-### 3. Konfigurasi Environment Variable (`.env`)
-Salin template `.env.example` menjadi `.env`:
-```bash
-cp .env.example .env
-```
-Pastikan file `.env` berisi konfigurasi berikut:
-```env
-GEO_MAPID_BASE_URL=https://geoserver.mapid.io/layers_new/get_layer
-GEO_MAPID_API_KEY=8a41b8d031864ba9ae82ccff447460f3
-GEO_MAPID_LAYER_ID=6aaa479abf51a2f0185a601b
-GEO_MAPID_PROJECT_ID=6aa3b36388f2c84b0c10cb58
-OPENFREEMAP_STYLE_URL=https://tiles.openfreemap.org/styles/liberty
-```
-*(Catatan: File `.env` sudah masuk ke dalam `.gitignore` sesuai standar keamanan kredensial).*
-
-### 4. Install Dependencies
+### 3. Install Dependencies
 ```bash
 flutter pub get
 ```
 
-### 5. Jalankan Aplikasi
+### 4. Jalankan Aplikasi
 ```bash
 flutter run
 ```
 
-### 6. Build File APK (Release)
+### 5. Build File APK (Release)
 ```bash
 flutter build apk
 ```
