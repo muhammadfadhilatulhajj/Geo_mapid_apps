@@ -23,7 +23,6 @@ class _MapPageState extends State<MapPage> {
   final Map<String, GeoFeatureEntity> _featuresById = {};
   Circle? _userLocationCircle;
   Circle? _userLocationPulseCircle;
-  int _selectedBottomNav = 0;
   String _activeCategoryFilter = 'Semua';
 
   @override
@@ -560,54 +559,6 @@ class _MapPageState extends State<MapPage> {
             ],
           );
         },
-      ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedBottomNav,
-          onTap: (index) {
-            setState(() {
-              _selectedBottomNav = index;
-            });
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF065F46),
-          unselectedItemColor: const Color(0xFF94A3B8),
-          selectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.map_outlined),
-              activeIcon: Icon(Icons.map_rounded),
-              label: 'Peta',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.layers_outlined),
-              activeIcon: Icon(Icons.layers_rounded),
-              label: 'Layer',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.table_chart_outlined),
-              activeIcon: Icon(Icons.table_chart_rounded),
-              label: 'Data',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_rounded),
-              label: 'Profil',
-            ),
-          ],
-        ),
       ),
     );
   }

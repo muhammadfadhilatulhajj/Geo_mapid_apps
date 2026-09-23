@@ -160,43 +160,15 @@ class _FeatureDetailSheetState extends State<FeatureDetailSheet> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  feature.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F172A),
-                                    letterSpacing: -0.3,
-                                    height: 1.25,
-                                  ),
-                                ),
-                              ),
-                              const Icon(
-                                Icons.verified_rounded,
-                                size: 18,
-                                color: Color(0xFF059669),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'ID Fitur: #${feature.id}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF64748B),
-                              fontFamily: 'monospace',
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      child: Text(
+                        feature.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
+                          height: 1.25,
+                        ),
                       ),
                     ),
                   ],
@@ -350,13 +322,12 @@ class _FeatureDetailSheetState extends State<FeatureDetailSheet> {
         Row(
           children: [
             Expanded(
-              flex: 5,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF065F46),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -370,46 +341,10 @@ class _FeatureDetailSheetState extends State<FeatureDetailSheet> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.turn_right_rounded, size: 17),
+                icon: const Icon(Icons.turn_right_rounded, size: 18),
                 label: const Text(
                   'Rute Cepat',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 5,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF1F5F9),
-                  foregroundColor: const Color(0xFF334155),
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 11),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  Clipboard.setData(
-                    ClipboardData(
-                      text: '${feature.latitude}, ${feature.longitude}',
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Koordinat WGS84 disalin!'),
-                      duration: Duration(seconds: 1),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.copy_rounded, size: 15),
-                label: const Text(
-                  'Salin WGS84',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ),
             ),
@@ -442,13 +377,6 @@ class _FeatureDetailSheetState extends State<FeatureDetailSheet> {
           ),
           child: Column(
             children: [
-              _buildFieldRow(
-                icon: Icons.category_rounded,
-                label: 'Tipe Geometri',
-                value: feature.geometryType,
-                color: const Color(0xFF2563EB),
-              ),
-              const Divider(color: Color(0xFFE2E8F0), height: 16),
               _buildFieldRow(
                 icon: Icons.my_location_rounded,
                 label: 'Koordinat (Latitude, Longitude)',
