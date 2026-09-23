@@ -115,42 +115,40 @@ class _MapPageState extends State<MapPage> {
 
     final target = LatLng(lat, lng);
 
-    if (_userLocationCircle != null) {
+    try {
       if (_userLocationPulseCircle != null) {
-        await _mapController?.updateCircle(
-          _userLocationPulseCircle!,
-          CircleOptions(geometry: target),
-        );
+        await _mapController?.removeCircle(_userLocationPulseCircle!);
+        _userLocationPulseCircle = null;
       }
-      await _mapController?.updateCircle(
-        _userLocationCircle!,
-        CircleOptions(geometry: target),
-      );
-    } else {
-      // Pulse outer halo
-      _userLocationPulseCircle = await _mapController?.addCircle(
-        CircleOptions(
-          geometry: target,
-          circleColor: '#3B82F6',
-          circleRadius: 22.0,
-          circleOpacity: 0.22,
-          circleStrokeWidth: 0.0,
-        ),
-      );
+      if (_userLocationCircle != null) {
+        await _mapController?.removeCircle(_userLocationCircle!);
+        _userLocationCircle = null;
+      }
+    } catch (_) {}
 
-      // Inner GPS marker
-      _userLocationCircle = await _mapController?.addCircle(
-        CircleOptions(
-          geometry: target,
-          circleColor: '#2563EB',
-          circleRadius: 9.5,
-          circleStrokeWidth: 3.5,
-          circleStrokeColor: '#FFFFFF',
-          circleOpacity: 1.0,
-          draggable: false,
-        ),
-      );
-    }
+    // Pulse outer halo
+    _userLocationPulseCircle = await _mapController?.addCircle(
+      CircleOptions(
+        geometry: target,
+        circleColor: '#3B82F6',
+        circleRadius: 22.0,
+        circleOpacity: 0.22,
+        circleStrokeWidth: 0.0,
+      ),
+    );
+
+    // Inner GPS marker
+    _userLocationCircle = await _mapController?.addCircle(
+      CircleOptions(
+        geometry: target,
+        circleColor: '#2563EB',
+        circleRadius: 9.5,
+        circleStrokeWidth: 3.5,
+        circleStrokeColor: '#FFFFFF',
+        circleOpacity: 1.0,
+        draggable: false,
+      ),
+    );
 
     _mapController?.animateCamera(
       CameraUpdate.newLatLngZoom(target, 15.5),
