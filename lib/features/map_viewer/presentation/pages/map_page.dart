@@ -400,65 +400,51 @@ class _MapPageState extends State<MapPage> {
                                 }
                               },
                             ),
+                          // Info Icon inside Search Card
+                          Tooltip(
+                            message: 'Ketuk marker titik untuk info detail',
+                            preferBelow: true,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.touch_app_rounded,
+                                          color: Color(0xFF34D399),
+                                          size: 18,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Ketuk salah satu titik di peta untuk melihat detail.',
+                                        ),
+                                      ],
+                                    ),
+                                    duration: Duration(seconds: 2),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline_rounded,
+                                  color: Color(0xFF2563EB),
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-
-                    // Floating Tooltip Pill (Positioned cleanly under search card inside Column)
-                    if (state.selectedFeature == null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0F172A).withAlpha(225),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(25),
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                            border: Border.all(
-                              color: Colors.white.withAlpha(35),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 7,
-                                height: 7,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF34D399),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Ketuk marker titik untuk info detail',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.touch_app_rounded,
-                                color: Color(0xFF34D399),
-                                size: 15,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
